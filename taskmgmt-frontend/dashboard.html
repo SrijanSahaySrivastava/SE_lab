@@ -7,15 +7,46 @@
   </head>
   <body>
     <header>
-      <h1>Task Management Dashboard</h1>
       <nav>
-        Welcome, <span id="usernameDisplay">User</span>!
+        Welcome, <span id="usernameDisplay">&lt;username&gt;</span>!
         <button id="logoutButton">Logout</button>
       </nav>
     </header>
 
     <div class="container">
       <div id="messageArea" class="hidden"></div>
+
+      <!-- Task List (moved to top) -->
+      <div class="form-section">
+        <h2>My Tasks</h2>
+        <div id="taskList">
+          <p>Loading tasks...</p>
+        </div>
+      </div>
+
+      <!-- Task Filters -->
+      <div class="form-section">
+        <h2>Filter Tasks</h2>
+        <label for="filterByTitle">Filter by Title (contains):</label>
+        <input
+          type="text"
+          id="filterByTitle"
+          placeholder="Enter part of a title"
+        />
+        <button onclick="filterTasksByTitle()">Filter by Title</button>
+        <br />
+        <label for="filterByAssignedUser">Filter by Assigned User:</label>
+        <input
+          type="text"
+          id="filterByAssignedUser"
+          placeholder="Enter username"
+        />
+        <button onclick="filterTasksByUser()">Filter by User</button>
+        <br />
+        <button onclick="fetchAllTasks()" class="button-secondary">
+          Show All Tasks
+        </button>
+      </div>
 
       <!-- Create/Edit Task Form -->
       <div class="form-section">
@@ -56,38 +87,6 @@
           </button>
         </form>
       </div>
-
-      <!-- Task Filters -->
-      <div class="form-section">
-        <h2>Filter Tasks</h2>
-        <label for="filterByTitle">Filter by Title (contains):</label>
-        <input
-          type="text"
-          id="filterByTitle"
-          placeholder="Enter part of a title"
-        />
-        <button onclick="filterTasksByTitle()">Filter by Title</button>
-        <br />
-        <label for="filterByAssignedUser">Filter by Assigned User:</label>
-        <input
-          type="text"
-          id="filterByAssignedUser"
-          placeholder="Enter username"
-        />
-        <button onclick="filterTasksByUser()">Filter by User</button>
-        <br />
-        <button onclick="fetchAllTasks()" class="button-secondary">
-          Show All Tasks
-        </button>
-      </div>
-
-      <!-- Task List -->
-      <div class="form-section">
-        <h2>My Tasks</h2>
-        <div id="taskList">
-          <p>Loading tasks...</p>
-        </div>
-      </div>
     </div>
 
     <script src="js/app.js"></script>
@@ -113,10 +112,10 @@
           redirectToLogin();
           return;
         }
-        // You might want to fetch user details to display username
-        // For now, just a generic welcome.
+        // Set the actual username dynamically (e.g., from local space or API)
+        document.getElementById("usernameDisplay").textContent =
+          getUsername() || "<username>";
         fetchAllTasks();
-
         taskForm.addEventListener("submit", handleTaskFormSubmit);
       });
 
@@ -132,15 +131,14 @@
 
       async function handleTaskFormSubmit(event) {
         event.preventDefault();
-        const originalTitleForEdit = taskOriginalTitleInput.value; // Title used to find task for PUT/PATCH
-
+        const originalTitleForEdit = taskOriginalTitleInput.value;
         const taskData = {
-          title: taskTitleInput.value, // This could be new or existing title
+          title: taskTitleInput.value,
           description: taskDescriptionInput.value,
           deadline: getISODateTime(taskDeadlineInput.value),
           status: taskStatusInput.value,
           assigned_to: taskAssignedToInput.value,
-          group: taskGroupInput.value || "", // Ensure empty string if not provided
+          group: taskGroupInput.value || "",
           progress: parseInt(taskProgressInput.value) || 0,
         };
 
@@ -159,32 +157,18 @@
 
         let response;
         if (originalTitleForEdit) {
-          // This means we are editing
-          // For PUT/PATCH, your backend expects the 'title' in the body to identify the task
-          // and also the new title if it's being changed.
-          // We'll use PATCH for partial updates. If you want PUT, ensure all fields are sent.
-          const updatePayload = { ...taskData };
-          // The `title` in updatePayload is the *new* title.
-          // The `originalTitleForEdit` is used in the request body to identify the task.
-          // So, the request body needs the original title to find the task, and then the new data.
-          // Your backend's TaskByNameBodyView get_task uses request.data.get('title')
-          // So, we need to send the *original* title as 'title' for identification,
-          // and if the title itself is being changed, it's part of the other fields.
-
-          const payloadForUpdate = { title: originalTitleForEdit, ...taskData };
+          const payloadForUpdate = { ...taskData, title: originalTitleForEdit };
           if (taskData.title !== originalTitleForEdit) {
-            // If title is changed, it's part of taskData.
+            payloadForUpdate.new_title = taskData.title;
           }
-
+          console.log("PATCH payload:", payloadForUpdate);
           displayMessage("Attempting to update task...", "success");
-          // Using PATCH: send original title for identification, and new data
           response = await makeApiRequest(
             "/tasks/byname/",
             "PATCH",
             payloadForUpdate
           );
         } else {
-          // Creating a new task
           response = await makeApiRequest("/tasks/", "POST", taskData);
         }
 
@@ -196,7 +180,7 @@
             "success"
           );
           resetTaskForm();
-          fetchAllTasks(); // Refresh the list
+          fetchAllTasks();
         }
       }
 
@@ -205,13 +189,10 @@
         submitTaskButton.textContent = "Save Changes";
         cancelEditButton.classList.remove("hidden");
 
-        taskOriginalTitleInput.value = task.title; // Store original title for submission
+        taskOriginalTitleInput.value = task.title;
         currentEditTaskTitle = task.title;
 
         taskTitleInput.value = task.title;
-        // taskTitleInput.readOnly = true; // Title is used for identification, typically not changed this way
-        // Or if changed, backend needs to handle it carefully.
-        // For your current setup, title in body identifies the task.
         taskDescriptionInput.value = task.description;
         taskDeadlineInput.value = formatDateTimeForInput(task.deadline);
         taskStatusInput.value = task.status;
@@ -219,7 +200,7 @@
         taskGroupInput.value = task.group || "";
         taskProgressInput.value = task.progress || 0;
 
-        window.scrollTo(0, 0); // Scroll to top to see the form
+        window.scrollTo(0, 0);
       }
 
       async function deleteTask(taskTitle) {
@@ -228,13 +209,12 @@
         ) {
           return;
         }
-        // Backend expects title in the body for DELETE via /tasks/byname/
         const response = await makeApiRequest("/tasks/byname/", "DELETE", {
           title: taskTitle,
         });
         if (response && response.status === 204) {
           displayMessage("Task deleted successfully!", "success");
-          fetchAllTasks(); // Refresh the list
+          fetchAllTasks();
         } else if (response) {
           displayMessage(
             "Failed to delete task. " +
@@ -246,43 +226,42 @@
 
       function renderTasks(tasks) {
         const taskListDiv = document.getElementById("taskList");
-        taskListDiv.innerHTML = ""; // Clear previous tasks
-
+        taskListDiv.innerHTML = "";
         if (!tasks || tasks.length === 0) {
           taskListDiv.innerHTML = "<p>No tasks found.</p>";
           return;
         }
-
         tasks.forEach((task) => {
           const taskItem = document.createElement("div");
           taskItem.className = "task-item";
           taskItem.innerHTML = `
-                    <h4>${task.title}</h4>
-                    <p><strong>Description:</strong> ${task.description}</p>
-                    <p><strong>Status:</strong> ${
-                      task.status
-                    } | <strong>Progress:</strong> ${task.progress}%</p>
-                    <p><strong>Deadline:</strong> ${new Date(
-                      task.deadline
-                    ).toLocaleString()}</p>
-                    <p><strong>Assigned To:</strong> ${task.assigned_to}</p>
-                    <p><strong>Group:</strong> ${task.group || "N/A"}</p>
-                    <small>Created by: ${
-                      task.created_by_username || task.created_by
-                    } | Created at: ${new Date(
+            <h4>${task.title}</h4>
+            <p><strong>Description:</strong> ${task.description}</p>
+            <p>
+              <strong>Status:</strong> ${task.status} | 
+              <strong>Progress:</strong>
+              <progress value="${task.progress}" max="100"></progress>
+            </p>
+            <p><strong>Deadline:</strong> ${new Date(
+              task.deadline
+            ).toLocaleString()}</p>
+            <p><strong>Assigned To:</strong> ${task.assigned_to}</p>
+            <p><strong>Group:</strong> ${task.group || "N/A"}</p>
+            <small>Created by: ${
+              task.created_by_username || task.created_by
+            } | Created at: ${new Date(
             task.created_at
           ).toLocaleDateString()}</small>
-                    <br><br>
-                    <button onclick="populateEditForm(${JSON.stringify(
-                      task
-                    ).replace(/"/g, "&quot;")})">Edit</button>
-                    <button class="button-danger" onclick="deleteTask('${task.title.replace(
-                      /'/g,
-                      "\\'"
-                    )}')">Delete</button>
-                `;
-          // Note: JSON.stringify(task).replace(/"/g, '&quot;') is to handle quotes in task data for inline JS
-          // And task.title.replace(/'/g, "\\'") for single quotes in title for deleteTask
+            <br><br>
+            <button onclick="populateEditForm(${JSON.stringify(task).replace(
+              /"/g,
+              "&quot;"
+            )})">Edit</button>
+            <button class="button-danger" onclick="deleteTask('${task.title.replace(
+              /'/g,
+              "\\'"
+            )}')">Delete</button>
+          `;
           taskListDiv.appendChild(taskItem);
         });
       }
@@ -292,13 +271,12 @@
         if (tasks) {
           renderTasks(tasks);
         } else {
-          renderTasks([]); // Render empty state
+          renderTasks([]);
         }
       }
 
       async function filterTasksByTitle() {
         const titleQuery = document.getElementById("filterByTitle").value;
-        // Your backend /tasks/titles/ expects title in GET body (non-standard)
         const tasks = await makeApiRequest("/tasks/titles/", "GET", {
           title: titleQuery || "",
         });
@@ -317,7 +295,6 @@
           displayMessage("Please enter a username to filter by.", "error");
           return;
         }
-        // Your backend /tasks/user/ expects username in GET body (non-standard)
         const tasks = await makeApiRequest("/tasks/user/", "GET", {
           username: usernameQuery,
         });
@@ -325,6 +302,20 @@
           renderTasks(tasks);
         } else {
           renderTasks([]);
+        }
+      }
+
+      // Example function to retrieve the current username (you can replace this with your own logic)
+      function getUsername() {
+        const token = localStorage.getItem("accessToken");
+        if (!token) return null;
+        try {
+          // Decode the token's payload which is base64 encoded
+          const payload = JSON.parse(window.atob(token.split(".")[1]));
+          return payload.username;
+        } catch (error) {
+          console.error("Failed to decode token", error);
+          return null;
         }
       }
     </script>
