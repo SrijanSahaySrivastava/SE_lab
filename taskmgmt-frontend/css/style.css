@@ -1,0 +1,168 @@
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f7f6;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+header {
+  width: 100%;
+  background-color: #34495e;
+  color: white;
+  padding: 1em 0;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+nav {
+  padding: 0.5em;
+}
+
+nav a,
+nav button {
+  color: white;
+  margin: 0 15px;
+  text-decoration: none;
+  font-size: 1.1em;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+nav a:hover,
+nav button:hover {
+  text-decoration: underline;
+}
+
+.container {
+  width: 90%;
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 25px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+h1,
+h2,
+h3 {
+  color: #2c3e50;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 10px;
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #34495e;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="datetime-local"],
+input[type="number"],
+textarea,
+select {
+  width: calc(100% - 22px); /* Account for padding and border */
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #d1d9e6;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 1em;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+button {
+  padding: 12px 20px;
+  margin-top: 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+.button-danger {
+  background-color: #e74c3c;
+}
+.button-danger:hover {
+  background-color: #c0392b;
+}
+
+.button-secondary {
+  background-color: #95a5a6;
+}
+.button-secondary:hover {
+  background-color: #7f8c8d;
+}
+
+#messageArea {
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.message-success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.task-item {
+  background-color: #ecf0f1;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border-left: 5px solid #3498db;
+}
+.task-item h4 {
+  margin-top: 0;
+  color: #2980b9;
+}
+.task-item p {
+  margin: 5px 0;
+}
+.task-item small {
+  color: #7f8c8d;
+}
+
+.form-section {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px dashed #bdc3c7;
+}
+.form-section:last-child {
+  border-bottom: none;
+}
+
+.hidden {
+  display: none;
+}

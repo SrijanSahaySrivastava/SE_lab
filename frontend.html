@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Task Management Frontend</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f4f7f6;
+        color: #333;
+      }
+      .container {
+        margin-bottom: 25px;
+        padding: 20px;
+        border: 1px solid #d1d9e6;
+        border-radius: 8px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        color: #2c3e50;
+      }
+      h2,
+      h3 {
+        color: #34495e;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 5px;
+      }
+      label {
+        display: block;
+        margin-top: 12px;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      input[type="text"],
+      input[type="password"],
+      input[type="datetime-local"],
+      input[type="number"],
+      textarea,
+      select {
+        width: calc(100% - 20px);
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+      }
+      textarea {
+        min-height: 80px;
+      }
+      button {
+        padding: 10px 18px;
+        margin-top: 15px;
+        cursor: pointer;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+      }
+      button:hover {
+        background-color: #2980b9;
+      }
+      .auth-button {
+        background-color: #2ecc71;
+      }
+      .auth-button:hover {
+        background-color: #27ae60;
+      }
+      .delete-button {
+        background-color: #e74c3c;
+      }
+      .delete-button:hover {
+        background-color: #c0392b;
+      }
+      pre {
+        background-color: #ecf0f1;
+        padding: 15px;
+        border: 1px solid #bdc3c7;
+        border-radius: 4px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+      #accessTokenDisplay {
+        font-weight: bold;
+        color: #2980b9;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Task Management</h1>
+
+    <div class="container">
+      <h3>Auth Token Management</h3>
+      <p>
+        Current Access Token: <span id="accessTokenDisplay">Not logged in</span>
+      </p>
+      <label for="manualToken"
+        >Set Token Manually (e.g., after refresh/external login):</label
+      >
+      <input
+        type="text"
+        id="manualToken"
+        placeholder="Paste JWT access token here"
+      />
+      <button onclick="setTokenManually()">Set Token</button>
+      <button onclick="logout()">Logout (Clear Token)</button>
+    </div>
+
+    <div class="container">
+      <h2>User Registration</h2>
+      <label for="regUsername">Username:</label>
+      <input type="text" id="regUsername" required />
+      <label for="regPassword">Password:</label>
+      <input type="password" id="regPassword" required />
+      <button class="auth-button" onclick="registerUser()">Register</button>
+    </div>
+
+    <div class="container">
+      <h2>User Login</h2>
+      <label for="loginUsername">Username:</label>
+      <input type="text" id="loginUsername" required />
+      <label for="loginPassword">Password:</label>
+      <input type="password" id="loginPassword" required />
+      <button class="auth-button" onclick="loginUser()">Login</button>
+    </div>
+
+    <div class="container">
+      <h2>Create Task (POST /api/tasks/)</h2>
+      <label for="createTitle">Title:</label>
+      <input type="text" id="createTitle" required />
+      <label for="createDescription">Description:</label>
+      <textarea id="createDescription" required></textarea>
+      <label for="createDeadline">Deadline:</label>
+      <input type="datetime-local" id="createDeadline" required />
+      <label for="createStatus">Status:</label>
+      <input type="text" id="createStatus" value="Pending" />
+      <label for="createAssignedTo">Assigned To (Username):</label>
+      <input type="text" id="createAssignedTo" required />
+      <label for="createGroup">Group (Optional):</label>
+      <input type="text" id="createGroup" />
+      <label for="createProgress">Progress (0-100, Optional):</label>
+      <input type="number" id="createProgress" value="0" min="0" max="100" />
+      <button onclick="createTask()">Create Task</button>
+    </div>
+
+    <div class="container">
+      <h2>All Tasks (GET /api/tasks/)</h2>
+      <button onclick="getAllTasks()">Fetch All Tasks</button>
+    </div>
+
+    <div class="container">
+      <h2>Task Operations by Title (via /api/tasks/byname/)</h2>
+      <p style="color: #c0392b">
+        Note: These operations identify tasks by title sent in the request body.
+        Ensure titles are unique for the logged-in user.
+      </p>
+
+      <h3>Get Task by Title</h3>
+      <label for="getByTitleName">Task Title:</label>
+      <input
+        type="text"
+        id="getByTitleName"
+        placeholder="Enter exact task title"
+      />
+      <button onclick="getTaskByTitle()">Get Task</button>
+
+      <h3>Update Task by Title (PUT - Full Update)</h3>
+      <label for="putTitle">Task Title to Update:</label>
+      <input
+        type="text"
+        id="putTitle"
+        placeholder="Exact title of task to update"
+        required
+      />
+      <label for="putDescription">New Description:</label>
+      <textarea id="putDescription" required></textarea>
+      <label for="putDeadline">New Deadline:</label>
+      <input type="datetime-local" id="putDeadline" required />
+      <label for="putStatus">New Status:</label>
+      <input type="text" id="putStatus" required />
+      <label for="putAssignedTo">New Assigned To (Username):</label>
+      <input type="text" id="putAssignedTo" required />
+      <label for="putGroup">New Group:</label>
+      <input type="text" id="putGroup" />
+      <label for="putProgress">New Progress (0-100):</label>
+      <input type="number" id="putProgress" min="0" max="100" required />
+      <button onclick="updateTaskByTitlePut()">Update Task (PUT)</button>
+
+      <h3>Partially Update Task by Title (PATCH)</h3>
+      <label for="patchTitle">Task Title to Update:</label>
+      <input
+        type="text"
+        id="patchTitle"
+        placeholder="Exact title of task to update"
+        required
+      />
+      <label for="patchDescription">New Description (Optional):</label>
+      <textarea id="patchDescription"></textarea>
+      <label for="patchDeadline">New Deadline (Optional):</label>
+      <input type="datetime-local" id="patchDeadline" />
+      <label for="patchStatus">New Status (Optional):</label>
+      <input type="text" id="patchStatus" />
+      <label for="patchAssignedTo">New Assigned To (Optional):</label>
+      <input type="text" id="patchAssignedTo" />
+      <label for="patchGroup">New Group (Optional):</label>
+      <input type="text" id="patchGroup" />
+      <label for="patchProgress">New Progress (Optional):</label>
+      <input type="number" id="patchProgress" min="0" max="100" />
+      <button onclick="updateTaskByTitlePatch()">
+        Partial Update Task (PATCH)
+      </button>
+
+      <h3>Delete Task by Title</h3>
+      <label for="deleteByTitleName">Task Title:</label>
+      <input
+        type="text"
+        id="deleteByTitleName"
+        placeholder="Enter exact task title"
+      />
+      <button class="delete-button" onclick="deleteTaskByTitle()">
+        Delete Task
+      </button>
+    </div>
+
+    <div class="container">
+      <h2>List Tasks by Title Filter (GET /api/tasks/titles/)</h2>
+      <p style="color: #c0392b">
+        Note: Backend expects title in GET request body (non-standard).
+      </p>
+      <label for="filterTaskTitle">Title to filter by (contains):</label>
+      <input
+        type="text"
+        id="filterTaskTitle"
+        placeholder="Enter part of a title"
+      />
+      <button onclick="listTasksByTitleFilter()">Filter Tasks by Title</button>
+    </div>
+
+    <div class="container">
+      <h2>List Tasks Assigned to Specific User (GET /api/tasks/user/)</h2>
+      <p style="color: #c0392b">
+        Note: Backend expects username in GET request body (non-standard).
+      </p>
+      <label for="filterAssignedUsername">Username:</label>
+      <input
+        type="text"
+        id="filterAssignedUsername"
+        placeholder="Enter username"
+      />
+      <button onclick="listTasksAssignedToUser()">List Tasks for User</button>
+    </div>
+
+    <div class="container">
+      <h2>API Response / Results</h2>
+      <pre id="resultsArea">No results yet.</pre>
+    </div>
+
+    <script>
+      const API_BASE_URL = "http://127.0.0.1:8000/api"; // Adjust if your API is hosted elsewhere
+      let accessToken = localStorage.getItem("accessToken");
+
+      const resultsArea = document.getElementById("resultsArea");
+      const accessTokenDisplay = document.getElementById("accessTokenDisplay");
+
+      function updateTokenDisplay() {
+        accessTokenDisplay.textContent = accessToken
+          ? accessToken.substring(0, 30) + "..."
+          : "Not logged in";
+      }
+      updateTokenDisplay();
+
+      function setTokenManually() {
+        const tokenInput = document.getElementById("manualToken").value;
+        if (tokenInput) {
+          accessToken = tokenInput;
+          localStorage.setItem("accessToken", accessToken);
+          updateTokenDisplay();
+          displayResults({ message: "Token set manually." });
+        } else {
+          displayResults({ error: "No token entered." });
+        }
+      }
+
+      function logout() {
+        accessToken = null;
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken"); // Assuming you might store this too
+        updateTokenDisplay();
+        displayResults({ message: "Logged out. Token cleared." });
+      }
+
+      function displayResults(data) {
+        resultsArea.textContent = JSON.stringify(data, null, 2);
+      }
+
+      async function makeApiRequest(
+        endpoint,
+        method = "GET",
+        body = null,
+        requiresAuth = true
+      ) {
+        const headers = { "Content-Type": "application/json" };
+        if (requiresAuth && accessToken) {
+          headers["Authorization"] = `Bearer ${accessToken}`;
+        } else if (requiresAuth && !accessToken) {
+          displayResults({
+            error: "Authentication token not found. Please log in.",
+          });
+          return null;
+        }
+
+        const config = {
+          method: method,
+          headers: headers,
+        };
+
+        if (body) {
+          config.body = JSON.stringify(body);
+        }
+
+        try {
+          const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+          if (response.status === 204) {
+            // No Content
+            return {
+              status: response.status,
+              data: { message: "Operation successful (No Content)" },
+            };
+          }
+          const responseData = await response.json();
+          if (!response.ok) {
+            console.error("API Error:", responseData);
+            displayResults({ status: response.status, error: responseData });
+            return null;
+          }
+          displayResults(responseData);
+          return responseData;
+        } catch (error) {
+          console.error("Fetch Error:", error);
+          displayResults({ error: error.message });
+          return null;
+        }
+      }
+
+      // --- User Authentication ---
+      async function registerUser() {
+        const username = document.getElementById("regUsername").value;
+        const password = document.getElementById("regPassword").value;
+        if (!username || !password) {
+          displayResults({
+            error: "Username and password are required for registration.",
+          });
+          return;
+        }
+        await makeApiRequest(
+          "/accounts/register/",
+          "POST",
+          { username, password },
+          false
+        );
+      }
+
+      async function loginUser() {
+        const username = document.getElementById("loginUsername").value;
+        const password = document.getElementById("loginPassword").value;
+        if (!username || !password) {
+          displayResults({
+            error: "Username and password are required for login.",
+          });
+          return;
+        }
+        const data = await makeApiRequest(
+          "/token/",
+          "POST",
+          { username, password },
+          false
+        );
+        if (data && data.access) {
+          accessToken = data.access;
+          localStorage.setItem("accessToken", accessToken);
+          if (data.refresh) localStorage.setItem("refreshToken", data.refresh);
+          updateTokenDisplay();
+          displayResults({
+            message: "Login successful!",
+            access_token: data.access,
+            refresh_token: data.refresh,
+          });
+        }
+      }
+
+      // --- Task CRUD ---
+      function getISODateTime(dateString) {
+        if (!dateString) return null;
+        try {
+          return new Date(dateString).toISOString();
+        } catch (e) {
+          console.warn("Could not parse date string to ISO: ", dateString);
+          return dateString; // return original if parsing fails, backend might handle
+        }
+      }
+
+      async function createTask() {
+        const deadlineValue = document.getElementById("createDeadline").value;
+        const taskData = {
+          title: document.getElementById("createTitle").value,
+          description: document.getElementById("createDescription").value,
+          deadline: getISODateTime(deadlineValue),
+          status: document.getElementById("createStatus").value,
+          assigned_to: document.getElementById("createAssignedTo").value,
+          group: document.getElementById("createGroup").value,
+          progress:
+            parseInt(document.getElementById("createProgress").value) || 0,
+        };
+        if (
+          !taskData.title ||
+          !taskData.description ||
+          !taskData.deadline ||
+          !taskData.assigned_to
+        ) {
+          displayResults({
+            error:
+              "Title, Description, Deadline, and Assigned To are required.",
+          });
+          return;
+        }
+        await makeApiRequest("/tasks/", "POST", taskData);
+      }
+
+      async function getAllTasks() {
+        await makeApiRequest("/tasks/", "GET");
+      }
+
+      // --- Task Operations by Title (/api/tasks/byname/) ---
+      async function getTaskByTitle() {
+        const title = document.getElementById("getByTitleName").value;
+        if (!title) {
+          displayResults({ error: "Task title is required." });
+          return;
+        }
+        // This endpoint expects title in the body for GET, which is non-standard
+        await makeApiRequest("/tasks/byname/", "GET", { title });
+      }
+
+      async function updateTaskByTitlePut() {
+        const title = document.getElementById("putTitle").value;
+        const deadlineValue = document.getElementById("putDeadline").value;
+        if (!title) {
+          displayResults({ error: "Task title to update is required." });
+          return;
+        }
+        const taskData = {
+          title: title, // Title to identify the task
+          description: document.getElementById("putDescription").value,
+          deadline: getISODateTime(deadlineValue),
+          status: document.getElementById("putStatus").value,
+          assigned_to: document.getElementById("putAssignedTo").value,
+          group: document.getElementById("putGroup").value,
+          progress: parseInt(document.getElementById("putProgress").value),
+        };
+        if (
+          !taskData.description ||
+          !taskData.deadline ||
+          !taskData.status ||
+          !taskData.assigned_to ||
+          isNaN(taskData.progress)
+        ) {
+          displayResults({
+            error:
+              "All fields (Description, Deadline, Status, Assigned To, Progress) are required for PUT.",
+          });
+          return;
+        }
+        await makeApiRequest("/tasks/byname/", "PUT", taskData);
+      }
+
+      async function updateTaskByTitlePatch() {
+        const title = document.getElementById("patchTitle").value;
+        if (!title) {
+          displayResults({ error: "Task title to update is required." });
+          return;
+        }
+        const taskData = { title: title }; // Title to identify the task
+
+        const description = document.getElementById("patchDescription").value;
+        const deadlineValue = document.getElementById("patchDeadline").value;
+        const status = document.getElementById("patchStatus").value;
+        const assignedTo = document.getElementById("patchAssignedTo").value;
+        const group = document.getElementById("patchGroup").value;
+        const progress = document.getElementById("patchProgress").value;
+
+        if (description) taskData.description = description;
+        if (deadlineValue) taskData.deadline = getISODateTime(deadlineValue);
+        if (status) taskData.status = status;
+        if (assignedTo) taskData.assigned_to = assignedTo;
+        if (group) taskData.group = group;
+        if (progress !== "" && !isNaN(parseInt(progress)))
+          taskData.progress = parseInt(progress);
+
+        if (Object.keys(taskData).length === 1) {
+          displayResults({
+            error: "At least one field to update must be provided for PATCH.",
+          });
+          return;
+        }
+        await makeApiRequest("/tasks/byname/", "PATCH", taskData);
+      }
+
+      async function deleteTaskByTitle() {
+        const title = document.getElementById("deleteByTitleName").value;
+        if (!title) {
+          displayResults({ error: "Task title is required for deletion." });
+          return;
+        }
+        await makeApiRequest("/tasks/byname/", "DELETE", { title });
+      }
+
+      // --- Other Task List Endpoints ---
+      async function listTasksByTitleFilter() {
+        const title = document.getElementById("filterTaskTitle").value;
+        // This endpoint expects title in the body for GET (non-standard)
+        // If title is empty, it should list all tasks according to backend logic
+        await makeApiRequest("/tasks/titles/", "GET", { title: title || "" });
+      }
+
+      async function listTasksAssignedToUser() {
+        const username = document.getElementById(
+          "filterAssignedUsername"
+        ).value;
+        if (!username) {
+          displayResults({ error: "Username is required to filter tasks." });
+          return;
+        }
+        // This endpoint expects username in the body for GET (non-standard)
+        await makeApiRequest("/tasks/user/", "GET", { username });
+      }
+    </script>
+  </body>
+</html>

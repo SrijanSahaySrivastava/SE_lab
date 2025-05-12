@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login - Task Management</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Task Management</h1>
+    </header>
+    <div class="container">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <label for="loginUsername">Username:</label>
+        <input type="text" id="loginUsername" required />
+
+        <label for="loginPassword">Password:</label>
+        <input type="password" id="loginPassword" required />
+
+        <button type="submit">Login</button>
+      </form>
+      <p>Don't have an account? <a href="register.html">Register here</a></p>
+      <div id="messageArea" class="hidden"></div>
+    </div>
+    <script src="js/app.js"></script>
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+          const username = document.getElementById("loginUsername").value;
+          const password = document.getElementById("loginPassword").value;
+
+          if (!username || !password) {
+            displayMessage("Username and password are required.", "error");
+            return;
+          }
+
+          const data = await makeApiRequest(
+            "/token/",
+            "POST",
+            { username, password },
+            false
+          );
+          if (data && data.access) {
+            saveToken(data.access);
+            if (data.refresh)
+              localStorage.setItem("refreshToken", data.refresh); // Optional: store refresh token
+            displayMessage("Login successful! Redirecting...", "success");
+            setTimeout(redirectToDashboard, 1500);
+          } else if (!data) {
+            // makeApiRequest handles displaying specific errors
+            // displayMessage('Login failed. Please check your credentials.', 'error');
+          }
+        });
+    </script>
+  </body>
+</html>

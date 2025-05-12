@@ -1,4 +1,3 @@
-# filepath: c:\Users\srija\Documents\GitHub\SE_lab\taskmgmt\accounts\serializers.py
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
