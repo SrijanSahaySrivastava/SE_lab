@@ -1,0 +1,374 @@
+{
+	"info": {
+		"_postman_id": "27506727-f032-4157-8b22-d12c4ea65935",
+		"name": "selab project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28422633"
+	},
+	"item": [
+		{
+			"name": "token",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"newuser\",\r\n    \"password\": \"secret\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/token/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"token",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"newuser\",\r\n    \"password\": \"secret\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/accounts/register/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"accounts",
+						"register",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "refreash token",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc0NzE2NDg1NCwiaWF0IjoxNzQ3MDc4NDU0LCJqdGkiOiIzMGNmYTA3MjI3NzU0ZjllODQxZWFlYWQ0ZTA3MmE0MSIsInVzZXJfaWQiOjJ9._rPIesN5nmYIMFvh_0_FnSsfoXTLjE8VUnfHOW_D1u4\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/token/refresh/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"token",
+						"refresh",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create task",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ3MDgwNzkzLCJpYXQiOjE3NDcwODA0OTMsImp0aSI6Ijg3MWZhY2MxZGJhNzQ0ZWQ4N2ViMDQ5YzJlYjFmYWVmIiwidXNlcl9pZCI6Mn0.zpvAy9MYoh2Soy7mDzip_J79G9eTDfPpGgbkfQS3umw",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"My New\",\r\n    \"description\": \"Details about the task.\",\r\n    \"deadline\": \"2025-06-30T12:00:00Z\",\r\n    \"status\": \"Pending\",\r\n    \"assigned_to\": \"newuser\",\r\n    \"group\": \"Development\",\r\n    \"progress\": 0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/tasks/create/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"tasks",
+						"create",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getTasks",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ3MDgyMjAxLCJpYXQiOjE3NDcwODE5MDEsImp0aSI6IjZlMzhkOTBkNjZiOTRiOTlhZjFmOWExZGJhNzlmMzRlIiwidXNlcl9pZCI6Mn0.oDwnRPvo540kjJYJ4To5rrByTGmNqhUngZmJF3bjZ60",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8000/api/tasks/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"tasks",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getTasks-titles",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ3MDc5ODk2LCJpYXQiOjE3NDcwNzk1OTYsImp0aSI6IjYzZWI0ZGFlM2I1YzQ0NWU5YTBkNWE3OWJmNzAxZWJkIiwidXNlcl9pZCI6Mn0.8bxGBFOub-a5HX7e0mkkY7FWfVH6N84K-PkG2w5wz3s",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"My New Task\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/tasks/titles/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"tasks",
+						"titles",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getTasks-username",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ3MDgwNTIwLCJpYXQiOjE3NDcwODAyMjAsImp0aSI6IjIyN2VhOTlhYjRmMTRiZDY4ZjA5N2ExMjM1OGIzOGQ4IiwidXNlcl9pZCI6Mn0.B26_ZU7kJvaFWgj14XbuEDbXAN8EYRIVuPB4u6ootuA",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"newuser\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/tasks/user/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"tasks",
+						"user",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteTask",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ3MDgyMjAxLCJpYXQiOjE3NDcwODE5MDEsImp0aSI6IjZlMzhkOTBkNjZiOTRiOTlhZjFmOWExZGJhNzlmMzRlIiwidXNlcl9pZCI6Mn0.oDwnRPvo540kjJYJ4To5rrByTGmNqhUngZmJF3bjZ60",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"My New Task\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/tasks/byname/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"tasks",
+						"byname",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ3MDgyMzgzLCJpYXQiOjE3NDcwODIwODMsImp0aSI6ImFmMjUyNTY0Mzc1MTRlYjQ4ZTNmMmRlZWEzYTAwZjZiIiwidXNlcl9pZCI6Mn0.nclW6p6-TUIqkKwy4skcTWW3Zk_W_q2J_oaKWc-Cn2M",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"My New\",\r\n    \"description\": \"This is the new updated description.\",\r\n    \"deadline\": \"2025-12-31T10:00:00Z\",\r\n    \"status\": \"In Progress\",\r\n    \"assigned_to\": \"newuser\",\r\n    \"group\": \"Updated Project Group\",\r\n    \"progress\": 50\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/tasks/byname/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"tasks",
+						"byname",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "patch",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ3MDgyMzgzLCJpYXQiOjE3NDcwODIwODMsImp0aSI6ImFmMjUyNTY0Mzc1MTRlYjQ4ZTNmMmRlZWEzYTAwZjZiIiwidXNlcl9pZCI6Mn0.nclW6p6-TUIqkKwy4skcTWW3Zk_W_q2J_oaKWc-Cn2M",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"My New\",\r\n    \"status\": \"Completed\",\r\n    \"progress\": 100\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/api/tasks/byname/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"tasks",
+						"byname",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
